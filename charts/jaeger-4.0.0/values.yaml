@@ -3,7 +3,7 @@
 # Jaeger values are grouped by component. Cassandra values override subchart values
 
 # Will use for user provided config
-# userconfig:
+userconfig:
 
 config:
   service:
@@ -87,7 +87,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 allInOne:
-  enabled: false
+  enabled: true
   replicas: 1
   image:
     registry: ""
@@ -555,7 +555,7 @@ agent:
 collector:
   podSecurityContext: {}
   securityContext: {}
-  enabled: true
+  enabled: false
   annotations: {}
   image:
     registry: ""
@@ -600,12 +600,14 @@ collector:
       # nodePort:
     otlp:
       grpc:
-        name: otlp-grpc
-        port: 4317
+        {}
+        # name: otlp-grpc
+        # port: 4317
         # nodePort:
       http:
-        name: otlp-http
-        port: 4318
+        {}
+        # name: otlp-http
+        # port: 4318
         # nodePort:
     healthCheck:
       name: healthcheck
@@ -723,7 +725,7 @@ collector:
     #   customRules: []
 
 query:
-  enabled: true
+  enabled: false
   basePath: /
   initContainers: []
   oAuthSidecar:
@@ -789,9 +791,9 @@ query:
     type: ClusterIP
     # List of IP ranges that are allowed to access the load balancer (if supported)
     loadBalancerSourceRanges: []
-    port: 16686
+    port: 80
     # Specify a custom target port (e.g. port of auth proxy)
-    targetPort: 16686
+    # targetPort: 8080
     # Specify a specific node port when type is NodePort
     # nodePort: 32500
     healthCheck:
