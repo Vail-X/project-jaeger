@@ -87,7 +87,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 allInOne:
-  enabled: true
+  enabled: false
   replicas: 1
   image:
     registry: ""
@@ -555,7 +555,7 @@ agent:
 collector:
   podSecurityContext: {}
   securityContext: {}
-  enabled: false
+  enabled: true
   annotations: {}
   image:
     registry: ""
@@ -600,14 +600,12 @@ collector:
       # nodePort:
     otlp:
       grpc:
-        {}
-        # name: otlp-grpc
-        # port: 4317
+        name: otlp-grpc
+        port: 4317
         # nodePort:
       http:
-        {}
-        # name: otlp-http
-        # port: 4318
+        name: otlp-http
+        port: 4318
         # nodePort:
     healthCheck:
       name: healthcheck
@@ -725,7 +723,7 @@ collector:
     #   customRules: []
 
 query:
-  enabled: false
+  enabled: true
   basePath: /
   initContainers: []
   oAuthSidecar:
@@ -791,9 +789,9 @@ query:
     type: ClusterIP
     # List of IP ranges that are allowed to access the load balancer (if supported)
     loadBalancerSourceRanges: []
-    port: 80
+    port: 16686
     # Specify a custom target port (e.g. port of auth proxy)
-    # targetPort: 8080
+    targetPort: 16686
     # Specify a specific node port when type is NodePort
     # nodePort: 32500
     healthCheck:
