@@ -227,9 +227,9 @@ storage:
     tls:
       enabled: false
       secretName: cassandra-tls-secret
-    # user: user
-    # usePassword: true
-    # password: password
+    user: user
+    usePassword: true
+    password: password
     keyspace: jaeger_v1_test
     ## Use existing secret (ignores previous password)
     # existingSecret:
@@ -312,12 +312,9 @@ cassandra:
     accessMode: ReadWriteOnce
     size: 10Gi
     resources:
-    requests:
-      memory: 2Gi
-      cpu: 1
-    limits: 
-      memory: 4Gi
-      cpu: 2
+      limits:
+        memory: 2Gi
+        cpu: 1
   config:
     cluster_name: jaeger
     seed_size: 1
@@ -367,7 +364,7 @@ schema:
   image:
     registry: ''
     repository: jaegertracing/jaeger-cassandra-schema
-    tag: ''
+    tag: '1.76.0'
     digest: ''
     pullPolicy: IfNotPresent
     pullSecrets: []
