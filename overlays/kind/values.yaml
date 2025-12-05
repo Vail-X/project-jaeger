@@ -3,70 +3,116 @@
 # Jaeger values are grouped by component. Cassandra values override subchart values
 
 # Will use for user provided config
-# userconfig:
+userconfig: |-
+    service:
+      extensions: [jaeger_storage, jaeger_query, healthcheckv2]
+      pipelines:
+        traces:
+          receivers: [otlp, jaeger, zipkin]
+          processors: [batch]
+          exporters: [jaeger_storage_exporter]
 
-config:
-  service:
-    extensions: [jaeger_storage, jaeger_query, healthcheckv2]
-    pipelines:
-      traces:
-        receivers: [otlp, jaeger, zipkin]
-        processors: [batch]
-        exporters: [jaeger_storage_exporter]
-
-  extensions:
-    healthcheckv2:
-      use_v2: true
-      http:
-        endpoint: 0.0.0.0:13133
-
-    # pprof:
-    #   endpoint: 0.0.0.0:1777
-    # zpages:
-    #   endpoint: 0.0.0.0:55679
-
-    jaeger_query:
-      storage:
-        traces: primary_store
-        traces_archive: archive_store
-
-    jaeger_storage:
-      backends:
-        primary_store:
-          elasticsearch:
-            index_prefix: jaeger
-            server_urls: ["http://elasticsearch-master:9200"]
-            username: elastic
-            password: changeme
-          memory:
-            max_traces: 100000
-        archive_store:
-          elasticsearch:
-            index_prefix: jaeger-archive
-            server_urls: ["http://elasticsearch-master:9200"]
-            username: elastic
-            password: changeme
-          memory:
-            max_traces: 100000
-
-  receivers:
-    otlp:
-      protocols:
-        grpc:
-          endpoint: 0.0.0.0:4317
+    extensions:
+      healthcheckv2:
+        use_v2: true
         http:
-          endpoint: 0.0.0.0:4318
-    jaeger:
-      protocols:
-        grpc:
-    zipkin:
+          endpoint: 0.0.0.0:13133
 
-  processors:
-    batch:
+      jaeger_storage:
+        backends:
+          primary_store:
+            memory:
+              max_traces: 100000
 
-  exporters:
-    jaeger_storage_exporter:
-      trace_storage: primary_store
+      jaeger_query:
+        storage:
+          traces: primary_store
+
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+      jaeger:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:14250
+          http:
+            endpoint: 0.0.0.0:14268
+      zipkin:
+        endpoint: 0.0.0.0:9411
+
+    processors:
+      batch:
+
+    exporters:
+      jaeger_storage_exporter:
+        trace_storage: primary_store
+
+# config:
+#   service:
+#     extensions: [jaeger_storage, jaeger_query, healthcheckv2]
+#     pipelines:
+#       traces:
+#         receivers: [otlp, jaeger, zipkin]
+#         processors: [batch]
+#         exporters: [jaeger_storage_exporter]
+
+#   extensions:
+#     healthcheckv2:
+#       use_v2: true
+#       http:
+#         endpoint: 0.0.0.0:13133
+
+#     # pprof:
+#     #   endpoint: 0.0.0.0:1777
+#     # zpages:
+#     #   endpoint: 0.0.0.0:55679
+
+#     jaeger_query:
+#       storage:
+#         traces: primary_store
+#         traces_archive: archive_store
+
+#     jaeger_storage:
+#       backends:
+#         primary_store:
+#           elasticsearch:
+#             index_prefix: jaeger
+#             server_urls: ["http://elasticsearch-master:9200"]
+#             username: elastic
+#             password: changeme
+#           memory:
+#             max_traces: 100000
+#         archive_store:
+#           elasticsearch:
+#             index_prefix: jaeger-archive
+#             server_urls: ["http://elasticsearch-master:9200"]
+#             username: elastic
+#             password: changeme
+#           memory:
+#             max_traces: 100000
+
+#   receivers:
+#     otlp:
+#       protocols:
+#         grpc:
+#           endpoint: 0.0.0.0:4317
+#         http:
+#           endpoint: 0.0.0.0:4318
+#     jaeger:
+#       protocols:
+#         grpc:
+#     zipkin:
+
+#   processors:
+#     batch:
+
+#   exporters:
+#     jaeger_storage_exporter:
+#       trace_storage: primary_store
 # The following settings apply to Jaeger v1 and partially to Jaeger v2
 
 global:
@@ -81,19 +127,19 @@ networkPolicy:
   enabled: false
 
 # Overrides the image tag where default is the chart appVersion.
-tag: ""
+tag: ''
 
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+fullnameOverride: ''
 
 allInOne:
   enabled: false
   replicas: 1
   image:
-    registry: ""
+    registry: ''
     repository: jaegertracing/jaeger
-    tag: ""
-    digest: ""
+    tag: ''
+    digest: ''
     pullPolicy: IfNotPresent
     pullSecrets: []
   extraEnv: []
@@ -247,7 +293,7 @@ storage:
     ephemeral: true
     persistence:
       mountPath: /mnt/data
-      useExistingPvcName: ""
+      useExistingPvcName: ''
     extraEnv: []
   memory:
     extraEnv: []
@@ -283,11 +329,11 @@ kafka:
 # Zookeeper has been deprecated by Kafka in favor of Kraft Mode: https://developer.confluent.io/learn/kraft/
 # Documentation for upgrading Kafka and keeping Zookeeper: https://github.com/bitnami/charts/tree/main/bitnami/kafka#upgrading-from-zookeeper-mode
 # Documentation for migrating away from Zookeeper to Kraft Mode: https://github.com/bitnami/charts/tree/main/bitnami/kafka#migrating-from-zookeeper-early-access
-  # zookeeper:
-  #   enabled: false
-  #   replicaCount: 1
-  #   serviceAccount:
-  #     create: true
+# zookeeper:
+#   enabled: false
+#   replicaCount: 1
+#   serviceAccount:
+#     create: true
 
 # End: Override values on the Kafka subchart to customize for Jaeger
 
@@ -301,10 +347,10 @@ schema:
   annotations: {}
   tolerations: []
   image:
-    registry: ""
+    registry: ''
     repository: jaegertracing/jaeger-cassandra-schema
-    tag: ""
-    digest: ""
+    tag: ''
+    digest: ''
     pullPolicy: IfNotPresent
     pullSecrets: []
   resources:
@@ -412,10 +458,10 @@ ingester:
   securityContext: {}
   annotations: {}
   image:
-    registry: ""
+    registry: ''
     repository: jaegertracing/jaeger-ingester
-    tag: ""
-    digest: ""
+    tag: ''
+    digest: ''
     pullPolicy: IfNotPresent
     pullSecrets: []
   dnsPolicy: ClusterFirst
@@ -476,10 +522,10 @@ agent:
   enabled: false
   annotations: {}
   image:
-    registry: ""
+    registry: ''
     repository: jaegertracing/jaeger-agent
-    tag: ""
-    digest: ""
+    tag: ''
+    digest: ''
     pullPolicy: IfNotPresent
     pullSecrets: []
   cmdlineParams: {}
@@ -540,7 +586,7 @@ agent:
   envFrom: []
   useHostNetwork: false
   dnsPolicy: ClusterFirst
-  priorityClassName: ""
+  priorityClassName: ''
   initContainers: []
 
   serviceMonitor:
@@ -558,10 +604,10 @@ collector:
   enabled: true
   annotations: {}
   image:
-    registry: ""
+    registry: ''
     repository: jaegertracing/jaeger
-    tag: ""
-    digest: ""
+    tag: ''
+    digest: ''
     pullPolicy: IfNotPresent
     pullSecrets: []
   dnsPolicy: ClusterFirst
@@ -580,12 +626,12 @@ collector:
   service:
     annotations: {}
     # The IP to be used by the load balancer (if supported)
-    loadBalancerIP: ""
+    loadBalancerIP: ''
     # List of IP ranges that are allowed to access the load balancer (if supported)
     loadBalancerSourceRanges: []
     type: ClusterIP
     # Cluster IP address to assign to service. Set to None to make service headless
-    clusterIP: ""
+    clusterIP: ''
     grpc:
       port: 14250
       # nodePort:
@@ -701,7 +747,7 @@ collector:
   #       "param": 1
   #     }
   #   }
-  priorityClassName: ""
+  priorityClassName: ''
   serviceMonitor:
     enabled: false
     additionalLabels: {}
@@ -740,7 +786,7 @@ query:
       registry: quay.io
       repository: oauth2-proxy/oauth2-proxy
       tag: v7.6.0
-      digest: ""
+      digest: ''
       pullPolicy: IfNotPresent
       pullSecrets: []
     containerPort: 4180
@@ -773,10 +819,10 @@ query:
   #        memory: 128Mi
   annotations: {}
   image:
-    registry: ""
+    registry: ''
     repository: jaegertracing/jaeger
-    tag: ""
-    digest: ""
+    tag: ''
+    digest: ''
     pullPolicy: IfNotPresent
     pullSecrets: []
   dnsPolicy: ClusterFirst
@@ -855,7 +901,7 @@ query:
   ##     ports:
   ##       - name: portname
   ##         containerPort: 1234
-  priorityClassName: ""
+  priorityClassName: ''
   serviceMonitor:
     enabled: false
     additionalLabels: {}
@@ -893,15 +939,15 @@ spark:
   podSecurityContext: {}
   annotations: {}
   image:
-    registry: ""
+    registry: ''
     repository: jaegertracing/spark-dependencies
     tag: latest
-    digest: ""
+    digest: ''
     pullPolicy: IfNotPresent
     pullSecrets: []
   cmdlineParams: {}
   extraEnv: []
-  schedule: "49 23 * * *"
+  schedule: '49 23 * * *'
   successfulJobsHistoryLimit: 5
   failedJobsHistoryLimit: 5
   concurrencyPolicy: Forbid
@@ -938,10 +984,10 @@ esIndexCleaner:
     runAsUser: 1000
   annotations: {}
   image:
-    registry: ""
+    registry: ''
     repository: jaegertracing/jaeger-es-index-cleaner
-    tag: ""
-    digest: ""
+    tag: ''
+    digest: ''
     pullPolicy: IfNotPresent
     pullSecrets: []
   cmdlineParams: {}
@@ -949,7 +995,7 @@ esIndexCleaner:
     []
     # - name: ROLLOVER
     #   value: 'true'
-  schedule: "55 23 * * *"
+  schedule: '55 23 * * *'
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
   concurrencyPolicy: Forbid
@@ -986,17 +1032,17 @@ esRollover:
     runAsUser: 1000
   annotations: {}
   image:
-    registry: ""
+    registry: ''
     repository: jaegertracing/jaeger-es-rollover
-    tag: ""
-    digest: ""
+    tag: ''
+    digest: ''
     pullPolicy: IfNotPresent
     pullSecrets: []
   cmdlineParams: {}
   extraEnv:
     - name: CONDITIONS
       value: '{"max_age": "1d"}'
-  schedule: "10 0 * * *"
+  schedule: '10 0 * * *'
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
   concurrencyPolicy: Forbid
@@ -1040,10 +1086,10 @@ esLookback:
     runAsUser: 1000
   annotations: {}
   image:
-    registry: ""
+    registry: ''
     repository: jaegertracing/jaeger-es-rollover
-    tag: ""
-    digest: ""
+    tag: ''
+    digest: ''
     pullPolicy: IfNotPresent
     pullSecrets: []
   cmdlineParams: {}
@@ -1051,8 +1097,8 @@ esLookback:
     - name: UNIT
       value: days
     - name: UNIT_COUNT
-      value: "7"
-  schedule: "5 0 * * *"
+      value: '7'
+  schedule: '5 0 * * *'
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
   concurrencyPolicy: Forbid
@@ -1099,10 +1145,10 @@ hotrod:
   #   - name: OTEL_EXPORTER_OTLP_ENDPOINT
   #     value: http://my-otel-collector.chart.local:4318
   image:
-    registry: ""
+    registry: ''
     repository: jaegertracing/example-hotrod
-    tag: ""
-    digest: ""
+    tag: ''
+    digest: ''
     pullPolicy: IfNotPresent
     pullSecrets: []
   service:
