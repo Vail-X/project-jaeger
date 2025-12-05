@@ -4,52 +4,50 @@
 
 # Will use for user provided config
 userconfig: |-
-    service:
-      extensions: [jaeger_storage, jaeger_query, healthcheckv2]
-      pipelines:
-        traces:
-          receivers: [otlp, jaeger, zipkin]
-          processors: [batch]
-          exporters: [jaeger_storage_exporter]
+  service:
+    extensions: [jaeger_storage, jaeger_query, healthcheckv2]
+    pipelines:
+      traces:
+        receivers: [otlp, jaeger]
+        processors: [batch]
+        exporters: [jaeger_storage_exporter]
 
-    extensions:
-      healthcheckv2:
-        use_v2: true
+  extensions:
+    healthcheckv2:
+      use_v2: true
+      http:
+        endpoint: 0.0.0.0:13133
+
+    jaeger_storage:
+      backends:
+        primary_store:
+          memory:
+            max_traces: 100000
+
+    jaeger_query:
+      storage:
+        traces: primary_store
+
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
         http:
-          endpoint: 0.0.0.0:13133
+          endpoint: 0.0.0.0:4318
+    jaeger:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:14250
+        thrift_http:
+          endpoint: 0.0.0.0:14268
 
-      jaeger_storage:
-        backends:
-          primary_store:
-            memory:
-              max_traces: 100000
+  processors:
+    batch:
 
-      jaeger_query:
-        storage:
-          traces: primary_store
-
-    receivers:
-      otlp:
-        protocols:
-          grpc:
-            endpoint: 0.0.0.0:4317
-          http:
-            endpoint: 0.0.0.0:4318
-      jaeger:
-        protocols:
-          grpc:
-            endpoint: 0.0.0.0:14250
-          thrift_http:
-            endpoint: 0.0.0.0:14268
-      zipkin:
-        endpoint: 0.0.0.0:9411
-
-    processors:
-      batch:
-
-    exporters:
-      jaeger_storage_exporter:
-        trace_storage: primary_store
+  exporters:
+    jaeger_storage_exporter:
+      trace_storage: primary_store
 
 # config:
 #   service:
@@ -809,7 +807,7 @@ query:
   podSecurityContext: {}
   securityContext: {}
   agentSidecar:
-    enabled: true
+    enabled: false
   #    resources:
   #      limits:
   #        cpu: 500m
