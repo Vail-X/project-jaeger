@@ -131,7 +131,7 @@ nameOverride: ''
 fullnameOverride: ''
 
 allInOne:
-  enabled: false
+  enabled: true
   replicas: 1
   image:
     registry: ''
@@ -599,7 +599,7 @@ agent:
 collector:
   podSecurityContext: {}
   securityContext: {}
-  enabled: true
+  enabled: false
   annotations: {}
   image:
     registry: ''
@@ -767,7 +767,7 @@ collector:
     #   customRules: []
 
 query:
-  enabled: true
+  enabled: false
   basePath: /
   initContainers: []
   oAuthSidecar:
