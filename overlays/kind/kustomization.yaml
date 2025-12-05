@@ -7,4 +7,4 @@ helmCharts:
   - name: jaeger-4.0.0
     releaseName: jaeger
     valuesFile: values.yaml
-    namespace: jaeger
+    namespace: observability
