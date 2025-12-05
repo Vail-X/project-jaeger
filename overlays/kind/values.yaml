@@ -21,8 +21,16 @@ userconfig: |-
     jaeger_storage:
       backends:
         primary_store:
-          memory:
-            max_traces: 100000
+          cassandra:
+            schema:
+              keyspace: "jaeger_v1_test"
+              create: true
+            connection:
+              servers: ["jaeger-cassandra:9042"]
+              auth:
+                basic:
+                  username: "${env:CASSANDRA_USERNAME}"
+                  password: "${env:CASSANDRA_PASSWORD}"
 
     jaeger_query:
       storage:
@@ -117,7 +125,7 @@ global:
   imageRegistry:
 
 provisionDataStore:
-  cassandra: false
+  cassandra: true
   elasticsearch: false
   kafka: false
 
@@ -131,7 +139,7 @@ nameOverride: ''
 fullnameOverride: ''
 
 allInOne:
-  enabled: true
+  enabled: false
   replicas: 1
   image:
     registry: ''
@@ -209,9 +217,9 @@ allInOne:
 
 storage:
   # allowed values (cassandra, elasticsearch, grpc-plugin, badger, memory)
-  type: memory
+  type: cassandra
   cassandra:
-    host: cassandra
+    host: jaeger-cassandra
     port: 9042
     # Change this value to false if you want to avoid starting the
     # -cassandra-schema Job
@@ -219,9 +227,9 @@ storage:
     tls:
       enabled: false
       secretName: cassandra-tls-secret
-    user: user
-    usePassword: true
-    password: password
+    # user: user
+    # usePassword: true
+    # password: password
     keyspace: jaeger_v1_test
     ## Use existing secret (ignores previous password)
     # existingSecret:
@@ -300,13 +308,25 @@ storage:
 cassandra:
   persistence:
     # To enable persistence, please see the documentation for the Cassandra chart
-    enabled: false
+    enabled: true
+    accessMode: ReadWriteOnce
+    size: 10Gi
+    resources:
+    requests:
+      memory: 2Gi
+      cpu: 1
+    limits: 
+      memory: 4Gi
+      cpu: 2
   config:
     cluster_name: jaeger
     seed_size: 1
     dc_name: dc1
     rack_name: rack1
     endpoint_snitch: GossipingPropertyFileSnitch
+  heap:
+    size: 1024M
+    newGenSize: 512M
 # End: Override values on the Cassandra subchart to customize for Jaeger
 
 # Begin: Override values on the Kafka subchart to customize for Jaeger
@@ -599,7 +619,7 @@ agent:
 collector:
   podSecurityContext: {}
   securityContext: {}
-  enabled: false
+  enabled: true
   annotations: {}
   image:
     registry: ''
@@ -767,7 +787,7 @@ collector:
     #   customRules: []
 
 query:
-  enabled: false
+  enabled: true
   basePath: /
   initContainers: []
   oAuthSidecar:
