@@ -21,16 +21,8 @@ userconfig: |-
     jaeger_storage:
       backends:
         primary_store:
-          cassandra:
-            schema:
-              keyspace: "jaeger_v1_test"
-              create: true
-            connection:
-              servers: ["jaeger-cassandra:9042"]
-              auth:
-                basic:
-                  username: "${env:CASSANDRA_USERNAME}"
-                  password: "${env:CASSANDRA_PASSWORD}"
+          memory:
+            max_traces: 100000
 
     jaeger_query:
       storage:
