@@ -125,7 +125,7 @@ global:
   imageRegistry:
 
 provisionDataStore:
-  cassandra: true
+  cassandra: false
   elasticsearch: false
   kafka: false
 
@@ -139,7 +139,7 @@ nameOverride: ''
 fullnameOverride: ''
 
 allInOne:
-  enabled: false
+  enabled: true
   replicas: 1
   image:
     registry: ''
@@ -217,7 +217,7 @@ allInOne:
 
 storage:
   # allowed values (cassandra, elasticsearch, grpc-plugin, badger, memory)
-  type: cassandra
+  type: memory
   cassandra:
     host: jaeger-cassandra
     port: 9042
@@ -308,13 +308,17 @@ storage:
 cassandra:
   persistence:
     # To enable persistence, please see the documentation for the Cassandra chart
-    enabled: true
+    enabled: false
+    storageClass: "longhorn-jaeger"
     accessMode: ReadWriteOnce
     size: 10Gi
-    resources:
-      limits:
-        memory: 2Gi
-        cpu: 1
+  resources:
+    requests:
+      memory: 2Gi
+      cpu: 1
+    limits:
+      memory: 4Gi
+      cpu: 2
   config:
     cluster_name: jaeger
     seed_size: 1
@@ -616,7 +620,7 @@ agent:
 collector:
   podSecurityContext: {}
   securityContext: {}
-  enabled: true
+  enabled: false
   annotations: {}
   image:
     registry: ''
@@ -784,7 +788,7 @@ collector:
     #   customRules: []
 
 query:
-  enabled: true
+  enabled: false
   basePath: /
   initContainers: []
   oAuthSidecar:
@@ -847,14 +851,14 @@ query:
   replicaCount: 1
   service:
     annotations: {}
-    type: ClusterIP
+    type: NodePort
     # List of IP ranges that are allowed to access the load balancer (if supported)
     loadBalancerSourceRanges: []
     port: 16686
     # Specify a custom target port (e.g. port of auth proxy)
     targetPort: 16686
     # Specify a specific node port when type is NodePort
-    # nodePort: 32500
+    nodePort: 16686
     healthCheck:
       name: healthcheck
       targetPort: healthcheck
